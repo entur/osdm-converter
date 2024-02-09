@@ -1,0 +1,6 @@
+target
+.idea
+run
+.gradle
+*.jar
+
