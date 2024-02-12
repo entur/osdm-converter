@@ -1,0 +1,15 @@
+POST http://localhost:8888/trip-pattern
+Content-Type: application/json
+
+{
+    "id": "blapp",
+    "legs": [
+        {
+            "id": "foo",
+            "travelDate": "2024-05-17",
+            "fromStopPlaceId": "NSR:StopPlace:420",
+            "toStopPlaceId": "NSR:StopPlace:542",
+            "serviceJourneyId": "NSB:ServiceJourney:320_173568-R"
+        }
+    ]
+}
