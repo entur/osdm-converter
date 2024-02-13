@@ -42,6 +42,10 @@ dependencies {
     val springCloudVersion = "4.1.0"
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:$springCloudVersion")
 
+    // https://mvnrepository.com/artifact/org.eaxy/eaxy
+    implementation("org.eaxy:eaxy:0.2.2")
+
+
 //	val feignVersion = "13.1"
 //	implementation("io.github.openfeign:feign-httpclient:$feignVersion")
 //	implementation("io.github.openfeign:feign-slf4j:$feignVersion")
@@ -52,6 +56,7 @@ dependencies {
     }
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }

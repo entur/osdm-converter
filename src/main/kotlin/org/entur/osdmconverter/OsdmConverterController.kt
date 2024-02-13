@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.RestController
 import java.time.ZonedDateTime
 
 @RestController
-class OsdmConverterController {
+class OsdmConverterController(
+    private val stopsRepository: StopsRepository
+) {
 
     @PostMapping("trip-pattern")
     fun convertTripPattern(@RequestBody request: ConvertTripPatternRequest): ConvertTripPatternResponse {
@@ -39,16 +41,22 @@ class OsdmConverterController {
 
     private fun toAlightSpecification(leg: ConvertTripPatternRequest.Leg): AlightSpecification {
         return AlightSpecification(
-            stopPlaceRef = StopPlaceRef(leg.fromStopPlaceId, objectType = "stopPlaceRef"),
+            stopPlaceRef = StopPlaceRef(getRikshallplatsUrn(leg.fromStopPlaceId), objectType = "StopPlaceRef"),
             serviceArrival = ServiceTime(timetabledTime = ZonedDateTime.now())
         )
     }
 
     private fun toBoardSpecification(leg: ConvertTripPatternRequest.Leg): BoardSpecification {
         return BoardSpecification(
-            stopPlaceRef = StopPlaceRef(leg.toStopPlaceId, objectType = "stopPlaceRef"),
+            stopPlaceRef = StopPlaceRef(getRikshallplatsUrn(leg.toStopPlaceId), objectType = "StopPlaceRef"),
             serviceDeparture = ServiceTime(timetabledTime = ZonedDateTime.now())
         )
+    }
+
+    private fun getRikshallplatsUrn(stopPlaceId: String): String {
+        val rikshallPlatsNr = stopsRepository.getRikshallplatsNr(stopPlaceId)
+        if(rikshallPlatsNr == null) throw RuntimeException("RikshallPlats number not found")
+        return "urn:x_swe:stn:$rikshallPlatsNr"
     }
 }
 
