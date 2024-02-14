@@ -42,13 +42,15 @@ dependencies {
     val springCloudVersion = "4.1.0"
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:$springCloudVersion")
 
-    // https://mvnrepository.com/artifact/org.eaxy/eaxy
     implementation("org.eaxy:eaxy:0.2.2")
 
+    val feignVersion = "13.1"
+    implementation("io.github.openfeign:feign-core:$feignVersion")
+    implementation("io.github.openfeign:feign-gson:$feignVersion")
+    implementation("io.github.openfeign:feign-okhttp:$feignVersion")
+    implementation("io.github.openfeign:feign-slf4j:$feignVersion")
 
-//	val feignVersion = "13.1"
-//	implementation("io.github.openfeign:feign-httpclient:$feignVersion")
-//	implementation("io.github.openfeign:feign-slf4j:$feignVersion")
+    implementation("com.google.guava:guava:33.0.0-jre")
 
     // ---------- Entur ---------- \\
     implementation("org.entur.logging:common-logging-spring-boot-starter:2.0.1") {

@@ -4,4 +4,7 @@ spring:
     application:
         name: osdm-converter
 
+clients:
+    journeyPlanner:
+        url: ${JOURNEY_URL:https://api.dev.entur.io/journey-planner/v3/nordic/graphql}
 

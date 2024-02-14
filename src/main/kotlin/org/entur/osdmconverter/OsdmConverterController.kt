@@ -1,15 +1,26 @@
 package org.entur.osdmconverter
 
 import io.osdm.*
+import org.entur.osdmconverter.client.journeyplanner.ServiceJourney
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
+import java.time.ZoneId
 import java.time.ZonedDateTime
 
 @RestController
 class OsdmConverterController(
-    private val stopsRepository: StopsRepository
+    private val stopsRepository: StopsRepository,
+    private val serviceJourneyRepository: ServiceJourneyRepository
 ) {
+    val modes = mapOf(
+        "bus" to "BUS",
+        "water" to "SHIP",
+        "rail" to "TRAIN",
+        "tram" to "TRAM",
+        "taxi" to "SHARED_TAXI",
+        "metro" to "UNDERGROUND"
+    )
 
     @PostMapping("trip-pattern")
     fun convertTripPattern(@RequestBody request: ConvertTripPatternRequest): ConvertTripPatternResponse {
@@ -24,38 +35,69 @@ class OsdmConverterController(
     }
 
     private fun toTimedLegSpecification(leg: ConvertTripPatternRequest.Leg): TimedLegSpecification {
+        val serviceJourney = serviceJourneyRepository.getServiceJourney(leg.serviceJourneyId)
+
         return TimedLegSpecification(
-            start = toBoardSpecification(leg),
-            end = toAlightSpecification(leg),
-            service = toDatedJourney(leg.serviceJourneyId)
+            start = toBoardSpecification(leg, serviceJourney),
+            end = toAlightSpecification(leg, serviceJourney),
+            service = toDatedJourney(serviceJourney)
         )
     }
 
-    private fun toDatedJourney(serviceJourneyId: String): DatedJourney {
+    private fun toDatedJourney(serviceJourney: ServiceJourney): DatedJourney {
         return DatedJourney(
-            mode = Mode(ptMode = "train"),
-            vehicleNumbers = listOf(),
+            mode = toMode(serviceJourney.transportMode),
+            vehicleNumbers = listOf(serviceJourney.line.publicCode),
             carriers = listOf()
         )
     }
 
-    private fun toAlightSpecification(leg: ConvertTripPatternRequest.Leg): AlightSpecification {
+    private fun toMode(transportMode: String): Mode {
+        return Mode(ptMode = modes[transportMode] ?: "")
+    }
+
+    private fun toAlightSpecification(
+        leg: ConvertTripPatternRequest.Leg,
+        serviceJourney: ServiceJourney
+    ): AlightSpecification {
+        val passingTime = serviceJourney.getPassingTime(leg.toStopPlaceId)
+            ?: throw IllegalArgumentException("This service journey does not pass station " + leg.toStopPlaceId)
+
         return AlightSpecification(
-            stopPlaceRef = StopPlaceRef(getRikshallplatsUrn(leg.fromStopPlaceId), objectType = "StopPlaceRef"),
-            serviceArrival = ServiceTime(timetabledTime = ZonedDateTime.now())
+            stopPlaceRef = StopPlaceRef(getRikshallplatsUrn(leg.toStopPlaceId), objectType = "StopPlaceRef"),
+            serviceArrival = ServiceTime(
+                timetabledTime = ZonedDateTime.of(
+                    leg.travelDate,
+                    passingTime.arrival.time,
+                    ZoneId.of("Europe/Stockholm")
+                )
+            )
         )
     }
 
-    private fun toBoardSpecification(leg: ConvertTripPatternRequest.Leg): BoardSpecification {
+    private fun toBoardSpecification(
+        leg: ConvertTripPatternRequest.Leg,
+        serviceJourney: ServiceJourney
+    ): BoardSpecification {
+        val passingTime = serviceJourney.getPassingTime(leg.fromStopPlaceId)
+            ?: throw IllegalArgumentException("This service journey does not pass station " + leg.fromStopPlaceId)
+
         return BoardSpecification(
-            stopPlaceRef = StopPlaceRef(getRikshallplatsUrn(leg.toStopPlaceId), objectType = "StopPlaceRef"),
-            serviceDeparture = ServiceTime(timetabledTime = ZonedDateTime.now())
+            stopPlaceRef = StopPlaceRef(getRikshallplatsUrn(leg.fromStopPlaceId), objectType = "StopPlaceRef"),
+            serviceDeparture = ServiceTime(
+                timetabledTime = ZonedDateTime.of(
+                    leg.travelDate,
+                    passingTime.departure.time,
+                    ZoneId.of("Europe/Stockholm")
+                )
+            )
         )
     }
 
     private fun getRikshallplatsUrn(stopPlaceId: String): String {
         val rikshallPlatsNr = stopsRepository.getRikshallplatsNr(stopPlaceId)
-        if(rikshallPlatsNr == null) throw RuntimeException("RikshallPlats number not found")
+        if (rikshallPlatsNr == null) throw RuntimeException("RikshallPlats number not found")
+
         return "urn:x_swe:stn:$rikshallPlatsNr"
     }
 }
