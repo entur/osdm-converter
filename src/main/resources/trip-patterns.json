@@ -14309,10 +14309,22 @@
                         {
                             "serviceJourney": {
                                 "id": "SE:050:ServiceJourney:121120000338664260",
+                                "keyValues": [
+                                    {
+                                        "key" : "productCode",
+                                        "value": "RE"
+                                    }
+                                ],
                                 "transportMode": "rail",
                                 "transportSubmode": "unknown",
                                 "line": {
                                     "id": "SE:050:Line:9011636080200000",
+                                    "keyValues": [
+                                        {
+                                            "key" : "salesAuthorityNumber",
+                                            "value": "123"
+                                        }
+                                    ],
                                     "publicCode": "Ö-tåg",
                                     "authority": {
                                         "id": "SE:050:Authority:9010636000000000",

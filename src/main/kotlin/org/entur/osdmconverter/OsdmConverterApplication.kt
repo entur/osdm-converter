@@ -18,7 +18,15 @@ class OsdmConverterApplication {
         stopsRepository.readFile(this::javaClass.javaClass.classLoader.getResourceAsStream("_minimal_stops.xml"))
         return stopsRepository
     }
+
+    @Bean
+    fun serviceJourneyRepository(): ServiceJourneyRepository {
+        val serviceJourneyRepository = ServiceJourneyRepository()
+        serviceJourneyRepository.readFile("trip-patterns.json")
+        return serviceJourneyRepository
+    }
 }
+
 fun main(args: Array<String>) {
     runApplication<OsdmConverterApplication>(*args)
 }

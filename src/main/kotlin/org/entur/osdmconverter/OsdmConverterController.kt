@@ -49,7 +49,17 @@ class OsdmConverterController(
         return DatedJourney(
             mode = toMode(serviceJourney.transportMode),
             vehicleNumbers = if (serviceJourney.line.publicCode == null) listOf() else listOf(serviceJourney.line.publicCode),
-            carriers = listOf()
+            carriers = listOf(),
+            productCategory = toProductCategory(serviceJourney.customKeyValues["productCode"])
+        )
+    }
+
+    private fun toProductCategory(productCode: String?): ProductCategory? {
+        if (productCode == null) return null
+        return ProductCategory(
+            name = "",
+            shortName = "",
+            productCategoryRef = "urn:x_swe:sbc:$productCode"
         )
     }
 

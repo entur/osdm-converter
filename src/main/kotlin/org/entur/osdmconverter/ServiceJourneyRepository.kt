@@ -7,31 +7,41 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.entur.osdmconverter.client.journeyplanner.JourneyPlannerResponse
 import org.entur.osdmconverter.client.journeyplanner.ServiceJourney
-import org.springframework.stereotype.Component
 
-@Component
+
 class ServiceJourneyRepository {
-    val serviceJourneys = run {
+    val serviceJourneys = HashMap<String, ServiceJourney>()
+    fun readFile(filename: String) {
         val response: JourneyPlannerResponse = ObjectMapper()
             .registerModule(KotlinModule.Builder().build())
             .registerModule(JavaTimeModule())
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
             .readValue(
-                javaClass.classLoader.getResourceAsStream("trip-patterns.json").reader()
+                javaClass.classLoader.getResourceAsStream(filename).reader()
             )
-        val serviceJourneys = response.data.trip.tripPatterns
+        val serviceJourneyList = response.data.trip.tripPatterns
             .flatMap { it.legs }
             .mapNotNull { it.serviceJourney }
 
-        val result = HashMap<String, ServiceJourney>()
-        for (serviceJourney in serviceJourneys) {
-            result[serviceJourney.id] = serviceJourney
+        for (serviceJourney in serviceJourneyList) {
+            serviceJourneys[serviceJourney.id] = serviceJourney
         }
-        result
     }
 
     fun getServiceJourney(id: String): ServiceJourney? {
         return serviceJourneys[id]
+    }
+
+    fun addServiceJourney(id: String, productCode: String, passingTimes: List<ServiceJourney.PassingTime>) {
+
+        serviceJourneys[id] = ServiceJourney(
+            id = id,
+            transportMode = "rail",
+            transportSubmode = "highSpeed",
+            line = ServiceJourney.Line("lineid", null, null, null),
+            passingTimes = passingTimes,
+            keyValuesList = listOf(ServiceJourney.KeyValue(key = "productCode", value = productCode))
+        )
     }
 }

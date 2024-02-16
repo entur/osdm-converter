@@ -49,7 +49,7 @@ class StopsRepository {
     }
 
     private fun write(stopPlace: StringWriter, event: XMLEvent) {
-        event.writeAsEncodedUnicode(stopPlace);
+        event.writeAsEncodedUnicode(stopPlace)
     }
 
     private fun addStopPlace(xml: String) {
@@ -68,5 +68,9 @@ class StopsRepository {
 
     fun getRikshallplatsNr(stopPlaceId: String): String? {
         return stops.get(stopPlaceId)
+    }
+
+    fun addStop(netexId: String, rikshallplatsnummer: Int) {
+        stops.put(netexId, rikshallplatsnummer.toString())
     }
 }

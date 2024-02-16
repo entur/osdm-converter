@@ -1,5 +1,6 @@
 package org.entur.osdmconverter.client.journeyplanner
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.LocalTime
 
 data class JourneyPlannerResponse(val data: Data) {
@@ -20,8 +21,12 @@ data class ServiceJourney(
     val transportMode: String,
     val transportSubmode: String,
     val line: Line,
-    val passingTimes: List<PassingTime>
+    val passingTimes: List<PassingTime>,
+    @JsonProperty("keyValues")
+    val keyValuesList: List<KeyValue>?
 ) {
+    val customKeyValues: MutableMap<String, String> = HashMap()
+
     data class Line(
         val id: String,
         val publicCode: String?,
@@ -34,7 +39,15 @@ data class ServiceJourney(
     data class Quay(val stopPlace: IdName)
     data class Time(val time: LocalTime, val dayOffset: Int)
 
+    data class KeyValue(val key: String, val value: String)
+
     fun getPassingTime(stopPlaceId: String): PassingTime? {
         return passingTimes.find { it.quay.stopPlace.id == stopPlaceId }
+    }
+
+    init {
+        if (null != keyValuesList) for (keyValue in keyValuesList) {
+            customKeyValues[keyValue.key] = keyValue.value
+        }
     }
 }
