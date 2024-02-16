@@ -25,9 +25,9 @@ Content-Type: application/json
         {
             "id": "foo",
             "travelDate": "2024-05-17",
-            "fromStopPlaceId": "SE:050:StopPlace:9021050000120000_2",
+            "fromStopPlaceId": "SE:050:StopPlace:9021050000003000_2",
             "toStopPlaceId": "SE:050:StopPlace:9021050025315000_2",
-            "serviceJourneyId": "SE:050:ServiceJourney:121120000338664860"
+            "serviceJourneyId": "SE:050:ServiceJourney:121120000338664260"
         }
     ]
 }

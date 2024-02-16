@@ -2,8 +2,17 @@ package org.entur.osdmconverter.client.journeyplanner
 
 import java.time.LocalTime
 
-data class GetServiceJourneyResponse(val data: Data) {
-    data class Data(val serviceJourney: ServiceJourney)
+data class JourneyPlannerResponse(val data: Data) {
+    data class Data(val trip: Trip) {
+    }
+
+    data class Trip(val tripPatterns: List<TripPattern>) {
+    }
+
+    data class TripPattern(val legs: List<Leg>) {
+    }
+
+    data class Leg(val serviceJourney: ServiceJourney?, val mode: String)
 }
 
 data class ServiceJourney(
@@ -15,9 +24,9 @@ data class ServiceJourney(
 ) {
     data class Line(
         val id: String,
-        val publicCode: String,
-        val authority: IdName,
-        val operator: IdName
+        val publicCode: String?,
+        val authority: IdName?,
+        val operator: IdName?
     )
 
     data class IdName(val id: String, val name: String)

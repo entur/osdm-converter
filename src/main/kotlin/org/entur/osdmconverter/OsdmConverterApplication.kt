@@ -15,7 +15,7 @@ class OsdmConverterApplication {
     @Bean
     fun stopsRepository(): StopsRepository {
         val stopsRepository = StopsRepository()
-        stopsRepository.readFile("run/stops/_stops.xml")
+        stopsRepository.readFile(this::javaClass.javaClass.classLoader.getResourceAsStream("_minimal_stops.xml"))
         return stopsRepository
     }
 }

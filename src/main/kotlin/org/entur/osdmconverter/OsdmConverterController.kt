@@ -36,6 +36,7 @@ class OsdmConverterController(
 
     private fun toTimedLegSpecification(leg: ConvertTripPatternRequest.Leg): TimedLegSpecification {
         val serviceJourney = serviceJourneyRepository.getServiceJourney(leg.serviceJourneyId)
+            ?: throw IllegalArgumentException("Unknown service journey: " + leg.serviceJourneyId)
 
         return TimedLegSpecification(
             start = toBoardSpecification(leg, serviceJourney),
@@ -47,7 +48,7 @@ class OsdmConverterController(
     private fun toDatedJourney(serviceJourney: ServiceJourney): DatedJourney {
         return DatedJourney(
             mode = toMode(serviceJourney.transportMode),
-            vehicleNumbers = listOf(serviceJourney.line.publicCode),
+            vehicleNumbers = if (serviceJourney.line.publicCode == null) listOf() else listOf(serviceJourney.line.publicCode),
             carriers = listOf()
         )
     }
