@@ -49,7 +49,7 @@ class OsdmConverterController(
         return DatedJourney(
             mode = toMode(serviceJourney.transportMode),
             vehicleNumbers = serviceJourney.line.publicCode?.let { listOf(it) } ?: emptyList(),
-            carriers = serviceJourney.getValue("salesAuthorityNumber")?.let { listOf(toCarrier(it)) } ?: emptyList(),
+            carriers = serviceJourney.getLineValue("salesAuthorityNumber")?.let { listOf(toCarrier(it)) } ?: emptyList(),
             productCategory = toProductCategory(serviceJourney.getValue("productCode"))
         )
     }
