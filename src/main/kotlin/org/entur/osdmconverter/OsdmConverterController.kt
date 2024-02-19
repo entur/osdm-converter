@@ -50,7 +50,7 @@ class OsdmConverterController(
             mode = toMode(serviceJourney.transportMode),
             vehicleNumbers = if (serviceJourney.line.publicCode == null) listOf() else listOf(serviceJourney.line.publicCode),
             carriers = listOf(),
-            productCategory = toProductCategory(serviceJourney.customKeyValues["productCode"])
+            productCategory = toProductCategory(serviceJourney.getValue("productCode"))
         )
     }
 

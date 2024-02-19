@@ -33,15 +33,15 @@ class ServiceJourneyRepository {
         return serviceJourneys[id]
     }
 
-    fun addServiceJourney(id: String, productCode: String, passingTimes: List<ServiceJourney.PassingTime>) {
-
-        serviceJourneys[id] = ServiceJourney(
+    fun addServiceJourney(id: String) : ServiceJourney {
+        val serviceJourney = ServiceJourney(
             id = id,
             transportMode = "rail",
             transportSubmode = "highSpeed",
             line = ServiceJourney.Line("lineid", null, null, null),
-            passingTimes = passingTimes,
-            keyValuesList = listOf(ServiceJourney.KeyValue(key = "productCode", value = productCode))
+            keyValuesList = mutableListOf()
         )
+        serviceJourneys[id] = serviceJourney
+        return serviceJourney
     }
 }

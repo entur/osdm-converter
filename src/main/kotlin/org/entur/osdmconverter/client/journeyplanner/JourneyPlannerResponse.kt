@@ -4,15 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.LocalTime
 
 data class JourneyPlannerResponse(val data: Data) {
-    data class Data(val trip: Trip) {
-    }
-
-    data class Trip(val tripPatterns: List<TripPattern>) {
-    }
-
-    data class TripPattern(val legs: List<Leg>) {
-    }
-
+    data class Data(val trip: Trip)
+    data class Trip(val tripPatterns: List<TripPattern>)
+    data class TripPattern(val legs: List<Leg>)
     data class Leg(val serviceJourney: ServiceJourney?, val mode: String)
 }
 
@@ -21,12 +15,10 @@ data class ServiceJourney(
     val transportMode: String,
     val transportSubmode: String,
     val line: Line,
-    val passingTimes: List<PassingTime>,
+    val passingTimes: MutableList<PassingTime> = ArrayList(),
     @JsonProperty("keyValues")
-    val keyValuesList: List<KeyValue>?
+    val keyValuesList: MutableList<KeyValue> = ArrayList()
 ) {
-    val customKeyValues: MutableMap<String, String> = HashMap()
-
     data class Line(
         val id: String,
         val publicCode: String?,
@@ -45,9 +37,21 @@ data class ServiceJourney(
         return passingTimes.find { it.quay.stopPlace.id == stopPlaceId }
     }
 
-    init {
-        if (null != keyValuesList) for (keyValue in keyValuesList) {
-            customKeyValues[keyValue.key] = keyValue.value
-        }
+    fun addPassingTime(arrival: LocalTime, departure: LocalTime, stopPlaceId: String) {
+        passingTimes.add(
+            PassingTime(
+                arrival = Time(arrival, 0),
+                departure = Time(departure, 0),
+                quay = Quay(IdName(stopPlaceId, "test"))
+            )
+        )
+    }
+
+    fun getValue(key: String): String? {
+        return keyValuesList.find { it.key == key }?.value
+    }
+
+    fun setValue(key: String, value: String) {
+        keyValuesList.add(KeyValue(key, value))
     }
 }
