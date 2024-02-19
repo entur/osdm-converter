@@ -54,4 +54,14 @@ class OsdmConverterControllerTest {
             convertTripPatternResponse.tripSpecification.legs[0].timedLeg!!.service.productCategory!!.productCategoryRef
         )
     }
+    @Test
+    fun mapSalesAuthorityNumber() {
+        serviceJourney.setValue("salesAuthorityNumber", "456")
+
+        val convertTripPatternResponse = osdmConverterController.convertTripPattern(request)
+        assertEquals(
+            "urn:x_swe:carrier:456",
+            convertTripPatternResponse.tripSpecification.legs[0].timedLeg!!.service.carriers[0].ref
+        )
+    }
 }
