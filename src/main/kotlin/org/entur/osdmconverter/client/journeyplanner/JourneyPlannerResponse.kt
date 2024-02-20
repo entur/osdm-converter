@@ -12,7 +12,7 @@ data class JourneyPlannerResponse(val data: Data) {
 
 data class ServiceJourney(
     val id: String,
-    val transportMode: String,
+    var transportMode: String,
     val transportSubmode: String,
     val line: Line,
     val passingTimes: MutableList<PassingTime> = ArrayList(),

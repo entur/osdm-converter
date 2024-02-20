@@ -54,6 +54,7 @@ class OsdmConverterControllerTest {
             convertTripPatternResponse.tripSpecification.legs[0].timedLeg!!.service.productCategory!!.productCategoryRef
         )
     }
+
     @Test
     fun mapSalesAuthorityNumber() {
         serviceJourney.line.setValue("salesAuthorityNumber", "456")
@@ -62,6 +63,26 @@ class OsdmConverterControllerTest {
         assertEquals(
             "urn:x_swe:carrier:456",
             convertTripPatternResponse.tripSpecification.legs[0].timedLeg!!.service.carriers[0].ref
+        )
+    }
+
+    @Test
+    fun mapTransportMode() {
+        assertModeMapping("bus", "BUS")
+        assertModeMapping("water", "SHIP")
+        assertModeMapping("rail", "TRAIN")
+        assertModeMapping("tram", "TRAM")
+        assertModeMapping("taxi", "SHARED_TAXI")
+        assertModeMapping("metro", "UNDERGROUND")
+    }
+
+    private fun assertModeMapping(netexMode: String, osdmMode: String) {
+        serviceJourney.transportMode = netexMode
+
+        val convertTripPatternResponse = osdmConverterController.convertTripPattern(request)
+        assertEquals(
+            osdmMode,
+            convertTripPatternResponse.tripSpecification.legs[0].timedLeg!!.service.mode?.ptMode
         )
     }
 }
