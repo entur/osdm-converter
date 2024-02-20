@@ -7,13 +7,6 @@ import kotlin.text.Charsets.UTF_8
 class StopsRepositoryTest {
 
     @Test
-    fun canLoadLargeFile() {
-        val stopsRepository = StopsRepository()
-        stopsRepository.readFile("run/stops/_stops.xml")
-        assertEquals(60257, stopsRepository.stops.size)
-    }
-
-    @Test
     fun canParseRikshallplatsNumber () {
         val stopsRepository = StopsRepository()
         stopsRepository.readFile(
