@@ -46,10 +46,14 @@ class OsdmConverterController(
     }
 
     private fun toDatedJourney(serviceJourney: ServiceJourney): DatedJourney {
+        var vehicleNumbers = serviceJourney.trainNumbers.map { it.forAdvertisement }
+        if (vehicleNumbers.isEmpty()) vehicleNumbers = serviceJourney.line.publicCode?.let { listOf(it) } ?: emptyList()
+
         return DatedJourney(
             mode = toMode(serviceJourney.transportMode),
-            vehicleNumbers = serviceJourney.line.publicCode?.let { listOf(it) } ?: emptyList(),
-            carriers = serviceJourney.line.getValue("salesAuthorityNumber")?.let { listOf(toCarrier(it)) } ?: emptyList(),
+            vehicleNumbers = vehicleNumbers,
+            carriers = serviceJourney.line.getValue("salesAuthorityNumber")?.let { listOf(toCarrier(it)) }
+                ?: emptyList(),
             productCategory = toProductCategory(serviceJourney.getValue("productCode"))
         )
     }

@@ -12,8 +12,8 @@ class OsdmConverterControllerTest {
     private lateinit var osdmConverterController: OsdmConverterController
     private lateinit var serviceJourneyRepository: ServiceJourneyRepository
 
-    private val stopId = "SE:050:StopPlace:9021050000003000_2"
-    private val stopId2 = "SE:050:StopPlace:9021050025315000_2"
+    private val fromStopPlaceId = "SE:050:StopPlace:9021050000003000_2"
+    private val toStopPlaceId = "SE:050:StopPlace:9021050025315000_2"
     private lateinit var serviceJourney: ServiceJourney
     private lateinit var request: ConvertTripPatternRequest
 
@@ -23,12 +23,12 @@ class OsdmConverterControllerTest {
         serviceJourneyRepository = ServiceJourneyRepository()
         osdmConverterController = OsdmConverterController(stopsRepository, serviceJourneyRepository)
 
-        stopsRepository.addStop(stopId, 6000001)
-        stopsRepository.addStop(stopId2, 6000002)
+        stopsRepository.addStop(fromStopPlaceId, 6000001)
+        stopsRepository.addStop(toStopPlaceId, 6000002)
 
         serviceJourney = serviceJourneyRepository.addServiceJourney("SE:050:ServiceJourney:121120000338664260")
-        serviceJourney.addPassingTime(LocalTime.now(), LocalTime.now(), stopId)
-        serviceJourney.addPassingTime(LocalTime.now(), LocalTime.now(), stopId2)
+        serviceJourney.addPassingTime(fromStopPlaceId, LocalTime.now(), LocalTime.now())
+        serviceJourney.addPassingTime(toStopPlaceId, LocalTime.now(), LocalTime.now())
 
         request = ConvertTripPatternRequest(
             id = "",
@@ -36,11 +36,63 @@ class OsdmConverterControllerTest {
                 ConvertTripPatternRequest.Leg(
                     id = "",
                     travelDate = LocalDate.now(),
-                    fromStopPlaceId = stopId,
-                    toStopPlaceId = stopId2,
+                    fromStopPlaceId = fromStopPlaceId,
+                    toStopPlaceId = toStopPlaceId,
                     serviceJourneyId = "SE:050:ServiceJourney:121120000338664260"
                 )
             )
+        )
+    }
+
+    @Test
+    fun mapDepartureTime() {
+        request.legs[0].travelDate = LocalDate.parse("2024-05-01")
+        serviceJourney.addPassingTime(fromStopPlaceId, "00:00", "13:00")
+
+        val convertTripPatternResponse = osdmConverterController.convertTripPattern(request)
+
+        assertEquals(
+            "2024-05-01T13:00+02:00[Europe/Stockholm]",
+            convertTripPatternResponse.tripSpecification.legs[0].timedLeg!!.start.serviceDeparture.timetabledTime.toString()
+        )
+    }
+
+    @Test
+    fun mapArrivalTime() {
+        request.legs[0].travelDate = LocalDate.parse("2024-05-01")
+        serviceJourney.addPassingTime(toStopPlaceId, "16:00", "00:00")
+
+        val convertTripPatternResponse = osdmConverterController.convertTripPattern(request)
+
+        assertEquals(
+            "2024-05-01T16:00+02:00[Europe/Stockholm]",
+            convertTripPatternResponse.tripSpecification.legs[0].timedLeg!!.end.serviceArrival.timetabledTime.toString()
+        )
+    }
+
+    @Test
+    fun mapDepartureStop() {
+        request.legs[0].fromStopPlaceId = fromStopPlaceId
+        stopsRepository.addStop(fromStopPlaceId, 6000001)
+
+        val convertTripPatternResponse = osdmConverterController.convertTripPattern(request)
+
+        assertEquals(
+            "urn:x_swe:stn:6000001",
+            convertTripPatternResponse.tripSpecification.legs[0].timedLeg!!.start.stopPlaceRef.stopPlaceRef
+        )
+    }
+
+    @Test
+    fun mapArrivalStop() {
+        request.legs[0].fromStopPlaceId = toStopPlaceId
+        stopsRepository.addStop(toStopPlaceId, 6000002)
+
+        val convertTripPatternResponse = osdmConverterController.convertTripPattern(request)
+
+        assertEquals(
+            "urn:x_swe:stn:6000002",
+            convertTripPatternResponse.tripSpecification.legs[0].timedLeg!!.end.stopPlaceRef.stopPlaceRef
         )
     }
 
@@ -63,6 +115,29 @@ class OsdmConverterControllerTest {
         assertEquals(
             "urn:x_swe:carrier:456",
             convertTripPatternResponse.tripSpecification.legs[0].timedLeg!!.service.carriers[0].ref
+        )
+    }
+
+    @Test
+    fun mapVehicleNumbersFromTrainNumbers() {
+        serviceJourney.addTrainNumber("620")
+        val convertTripPatternResponse = osdmConverterController.convertTripPattern(request)
+        assertEquals(
+            "620",
+            convertTripPatternResponse.tripSpecification.legs[0].timedLeg!!.service.vehicleNumbers[0]
+        )
+    }
+
+    @Test
+    fun mapVehicleNumbersFromLineNumber() {
+        serviceJourney.trainNumbers.clear()
+        serviceJourney.line.publicCode = "620"
+
+        val convertTripPatternResponse = osdmConverterController.convertTripPattern(request)
+
+        assertEquals(
+            "620",
+            convertTripPatternResponse.tripSpecification.legs[0].timedLeg!!.service.vehicleNumbers[0]
         )
     }
 

@@ -14081,6 +14081,12 @@
                                 "id": "SE:050:ServiceJourney:747400000000001729",
                                 "transportMode": "rail",
                                 "transportSubmode": "unknown",
+                                "trainNumbers": [
+                                    {
+                                        "id": "SE:050:TrainNumber:9011686028800000_549",
+                                        "forAdvertisement": "549"
+                                    }
+                                ],
                                 "line": {
                                     "id": "SE:050:Line:9011657046200000",
                                     "publicCode": "549",

@@ -17,11 +17,12 @@ data class ServiceJourney(
     val line: Line,
     val passingTimes: MutableList<PassingTime> = ArrayList(),
     @JsonProperty("keyValues")
-    val keyValuesList: MutableList<KeyValue> = ArrayList()
+    val keyValuesList: MutableList<KeyValue> = ArrayList(),
+    val trainNumbers: MutableList<TrainNumber> = ArrayList()
 ) {
     data class Line(
         val id: String,
-        val publicCode: String?,
+        var publicCode: String?,
         val authority: IdName?,
         val operator: IdName?,
         @JsonProperty("keyValues")
@@ -44,11 +45,18 @@ data class ServiceJourney(
 
     data class KeyValue(val key: String, val value: String)
 
+    data class TrainNumber (val id: String, val forAdvertisement: String)
+
     fun getPassingTime(stopPlaceId: String): PassingTime? {
         return passingTimes.find { it.quay.stopPlace.id == stopPlaceId }
     }
 
-    fun addPassingTime(arrival: LocalTime, departure: LocalTime, stopPlaceId: String) {
+    fun addPassingTime(stopPlaceId: String, arrival: String, departure: String) {
+        addPassingTime(stopPlaceId, LocalTime.parse(arrival), LocalTime.parse(departure))
+    }
+
+    fun addPassingTime(stopPlaceId: String, arrival: LocalTime, departure: LocalTime) {
+        passingTimes.removeIf { it.quay.stopPlace.id == stopPlaceId }
         passingTimes.add(
             PassingTime(
                 arrival = Time(arrival, 0),
@@ -66,5 +74,7 @@ data class ServiceJourney(
         keyValuesList.add(KeyValue(key, value))
     }
 
-
+    fun addTrainNumber(forAdvertisement: String) {
+        trainNumbers.add(TrainNumber("SE:050:TrainNumber:9011686028800000_$forAdvertisement", forAdvertisement))
+    }
 }
