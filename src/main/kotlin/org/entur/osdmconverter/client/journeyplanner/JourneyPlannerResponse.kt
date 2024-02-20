@@ -26,7 +26,16 @@ data class ServiceJourney(
         val operator: IdName?,
         @JsonProperty("keyValues")
         val keyValuesList: MutableList<KeyValue> = ArrayList()
-    )
+
+    ) {
+        fun setValue(key: String, value: String) {
+            keyValuesList.add(KeyValue(key, value))
+        }
+
+        fun getValue(key: String): String? {
+            return keyValuesList.find { it.key == key }?.value
+        }
+    }
 
     data class IdName(val id: String, val name: String)
     data class PassingTime(val quay: Quay, val departure: Time, val arrival: Time)
@@ -57,11 +66,5 @@ data class ServiceJourney(
         keyValuesList.add(KeyValue(key, value))
     }
 
-    fun setLineValue(key:String, value: String) {
-        line.keyValuesList.add(KeyValue(key, value))
-    }
 
-    fun getLineValue(key: String): String? {
-        return line.keyValuesList.find { it.key == key }?.value
-    }
 }

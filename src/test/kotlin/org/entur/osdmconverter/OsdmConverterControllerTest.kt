@@ -56,7 +56,7 @@ class OsdmConverterControllerTest {
     }
     @Test
     fun mapSalesAuthorityNumber() {
-        serviceJourney.setLineValue("salesAuthorityNumber", "456")
+        serviceJourney.line.setValue("salesAuthorityNumber", "456")
 
         val convertTripPatternResponse = osdmConverterController.convertTripPattern(request)
         assertEquals(
