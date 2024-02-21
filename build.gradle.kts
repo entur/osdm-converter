@@ -66,10 +66,9 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-
-tasks.register<GenerateTask>("generateOsdmSpec") {
+tasks.register<GenerateTask>("generateOSDMCoverterSpec") {
     validateSpec.set(false)
-    inputSpec.set("$rootDir/src/main/resources/OSDM-online-api-v3.0.3.yml")
+    inputSpec.set("$rootDir/src/main/resources/OSDM-converter-api-v1.yml")
     generatorName.set("kotlin-spring")
     outputDir.set("${buildDir}/generated-openapi/osdm")
     modelPackage.set("io.osdm")
@@ -86,5 +85,5 @@ tasks.register<GenerateTask>("generateOsdmSpec") {
 }
 
 tasks.compileKotlin {
-    dependsOn(tasks.getByName("generateOsdmSpec"))
+    dependsOn(tasks.getByName("generateOSDMCoverterSpec"))
 }

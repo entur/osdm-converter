@@ -25,16 +25,16 @@ class OsdmConverterController(
     @PostMapping("trip-pattern")
     fun convertTripPattern(@RequestBody request: ConvertTripPatternRequest): ConvertTripPatternResponse {
         return ConvertTripPatternResponse(
-            request.id,
-            TripSpecification(legs = request.legs.map(::toTripLegSpecification))
+            id = request.id,
+            tripSpecification = TripSpecification(legs = request.legs.map(::toTripLegSpecification))
         )
     }
 
-    private fun toTripLegSpecification(leg: ConvertTripPatternRequest.Leg): TripLegSpecification {
+    private fun toTripLegSpecification(leg: Leg): TripLegSpecification {
         return TripLegSpecification(timedLeg = toTimedLegSpecification(leg))
     }
 
-    private fun toTimedLegSpecification(leg: ConvertTripPatternRequest.Leg): TimedLegSpecification {
+    private fun toTimedLegSpecification(leg: Leg): TimedLegSpecification {
         val serviceJourney = serviceJourneyRepository.getServiceJourney(leg.serviceJourneyId)
             ?: throw IllegalArgumentException("Unknown service journey: " + leg.serviceJourneyId)
 
@@ -79,7 +79,7 @@ class OsdmConverterController(
     }
 
     private fun toAlightSpecification(
-        leg: ConvertTripPatternRequest.Leg,
+        leg: Leg,
         serviceJourney: ServiceJourney
     ): AlightSpecification {
         val passingTime = serviceJourney.getPassingTime(leg.toStopPlaceId)
@@ -98,7 +98,7 @@ class OsdmConverterController(
     }
 
     private fun toBoardSpecification(
-        leg: ConvertTripPatternRequest.Leg,
+        leg: Leg,
         serviceJourney: ServiceJourney
     ): BoardSpecification {
         val passingTime = serviceJourney.getPassingTime(leg.fromStopPlaceId)

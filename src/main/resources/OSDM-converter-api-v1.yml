@@ -1,0 +1,73 @@
+openapi: 3.0.3
+info:
+  title: OSDM Converter API
+  description: API that returns a trip specification on ODSM format based on NeTEx serviceJourneyId, stopPlaceId and travel date
+  version: 1.0.0
+paths:
+  /trip-pattern:
+    post:
+      tags:
+        - Osdm converter
+      summary: Returns trip information on a ODSM format
+      requestBody:
+        description: NeTEx trip pattern request
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConvertTripPatternRequest'
+      responses:
+        '200':
+          description: A minimal OSDM trip specification from origin to destination with additional id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConvertTripPatternResponse'
+
+components:
+  schemas:
+    ConvertTripPatternRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        legs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Leg'
+      required:
+          - legs
+    Leg:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        travelDate:
+          type: string
+          format: date
+          example: "2024-05-17"
+        fromStopPlaceId:
+          type: string
+          example: "SE:050:StopPlace:9021050000003000_2"
+        toStopPlaceId:
+          type: string
+          example: "SE:050:StopPlace:9021050025315000_2"
+        serviceJourneyId:
+          type: string
+          example: "SE:050:ServiceJourney:121120000338664260"
+      required:
+        - travelDate
+        - fromStopPlaceId
+        - toStopPlaceId
+        - serviceJourneyId
+    ConvertTripPatternResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        tripSpecification:
+          $ref: 'OSDM-online-api-v3.0.3.yml#/components/schemas/TripSpecification'
+      required:
+          - tripSpecification

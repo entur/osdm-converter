@@ -1,5 +1,7 @@
 package org.entur.osdmconverter
 
+import io.osdm.ConvertTripPatternRequest
+import io.osdm.Leg
 import org.entur.osdmconverter.client.journeyplanner.ServiceJourney
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -11,11 +13,12 @@ class OsdmConverterControllerTest {
     private lateinit var stopsRepository: StopsRepository
     private lateinit var osdmConverterController: OsdmConverterController
     private lateinit var serviceJourneyRepository: ServiceJourneyRepository
+    private lateinit var serviceJourney: ServiceJourney
+    private lateinit var request: ConvertTripPatternRequest
 
     private val fromStopPlaceId = "SE:050:StopPlace:9021050000003000_2"
     private val toStopPlaceId = "SE:050:StopPlace:9021050025315000_2"
-    private lateinit var serviceJourney: ServiceJourney
-    private lateinit var request: ConvertTripPatternRequest
+    private val travelDate = LocalDate.parse("2024-05-01")
 
     @BeforeEach
     fun setUp() {
@@ -33,9 +36,9 @@ class OsdmConverterControllerTest {
         request = ConvertTripPatternRequest(
             id = "",
             legs = listOf(
-                ConvertTripPatternRequest.Leg(
+                Leg(
                     id = "",
-                    travelDate = LocalDate.now(),
+                    travelDate = travelDate,
                     fromStopPlaceId = fromStopPlaceId,
                     toStopPlaceId = toStopPlaceId,
                     serviceJourneyId = "SE:050:ServiceJourney:121120000338664260"
@@ -46,20 +49,18 @@ class OsdmConverterControllerTest {
 
     @Test
     fun mapDepartureTime() {
-        request.legs[0].travelDate = LocalDate.parse("2024-05-01")
         serviceJourney.addPassingTime(fromStopPlaceId, "00:00", "13:00")
 
         val convertTripPatternResponse = osdmConverterController.convertTripPattern(request)
 
         assertEquals(
-            "2024-05-01T13:00+02:00[Europe/Stockholm]",
+            "${travelDate}T13:00+02:00[Europe/Stockholm]",
             convertTripPatternResponse.tripSpecification.legs[0].timedLeg!!.start.serviceDeparture.timetabledTime.toString()
         )
     }
 
     @Test
     fun mapArrivalTime() {
-        request.legs[0].travelDate = LocalDate.parse("2024-05-01")
         serviceJourney.addPassingTime(toStopPlaceId, "16:00", "00:00")
 
         val convertTripPatternResponse = osdmConverterController.convertTripPattern(request)
@@ -72,7 +73,6 @@ class OsdmConverterControllerTest {
 
     @Test
     fun mapDepartureStop() {
-        request.legs[0].fromStopPlaceId = fromStopPlaceId
         stopsRepository.addStop(fromStopPlaceId, 6000001)
 
         val convertTripPatternResponse = osdmConverterController.convertTripPattern(request)
@@ -85,7 +85,6 @@ class OsdmConverterControllerTest {
 
     @Test
     fun mapArrivalStop() {
-        request.legs[0].fromStopPlaceId = toStopPlaceId
         stopsRepository.addStop(toStopPlaceId, 6000002)
 
         val convertTripPatternResponse = osdmConverterController.convertTripPattern(request)
