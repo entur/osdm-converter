@@ -53,6 +53,9 @@ dependencies {
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.withType<KotlinCompile> {
@@ -70,7 +73,8 @@ tasks.register<GenerateTask>("generateOSDMCoverterSpec") {
     validateSpec.set(false)
     inputSpec.set("$rootDir/src/main/resources/OSDM-converter-api-v1.yml")
     generatorName.set("kotlin-spring")
-    outputDir.set("${buildDir}/generated-openapi/osdm")
+
+    outputDir.set(layout.buildDirectory.file("generated-openapi/osdm").map { it.asFile.path })
     modelPackage.set("io.osdm")
 
     typeMappings.set(mapOf("java.time.OffsetDateTime" to "java.time.ZonedDateTime"))
@@ -81,7 +85,7 @@ tasks.register<GenerateTask>("generateOSDMCoverterSpec") {
     configOptions.put("enumPropertyNaming", "UPPERCASE")
     configOptions.put("useSpringBoot3", "true")
 
-    sourceSets["main"].java.srcDir(file("${buildDir}/generated-openapi/osdm/src/main"))
+    sourceSets["main"].java.srcDir(layout.buildDirectory.file("generated-openapi/osdm/src/main"))
 }
 
 tasks.compileKotlin {
