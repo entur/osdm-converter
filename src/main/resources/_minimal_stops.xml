@@ -24,6 +24,24 @@
                     </keyList>
                     <Name>København H</Name>
                 </StopPlace>
+                <StopPlace version="20131219" id="SE:050:StopPlace:9021050000166000_1">
+                    <keyList>
+                        <KeyValue>
+                            <Key>rikshallplats</Key>
+                            <Value>740000003</Value>
+                        </KeyValue>
+                    </keyList>
+                    <Name>Katrineholm Resecentrum</Name>
+                </StopPlace>
+                <StopPlace version="20131219" id="SE:050:StopPlace:9021050000120000_2">
+                    <keyList>
+                        <KeyValue>
+                            <Key>rikshallplats</Key>
+                            <Value>740000004</Value>
+                        </KeyValue>
+                    </keyList>
+                    <Name>Lund Centralstation</Name>
+                </StopPlace>
             </stopPlaces>
         </SiteFrame>
     </dataObjects>
