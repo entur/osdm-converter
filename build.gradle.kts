@@ -6,7 +6,6 @@ plugins {
     id("io.spring.dependency-management") version "1.1.4"
     kotlin("jvm") version "1.9.21"
     kotlin("plugin.spring") version "1.9.21"
-    //id("org.openapi.generator") version "7.0.1"
     id("org.openapi.generator") version "7.3.0"
 }
 
