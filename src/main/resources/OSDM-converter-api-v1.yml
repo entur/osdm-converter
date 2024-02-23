@@ -1,73 +1,78 @@
 openapi: 3.0.3
 info:
-  title: OSDM Converter API
-  description: API that returns a trip specification on ODSM format based on NeTEx serviceJourneyId, stopPlaceId and travel date
-  version: 1.0.0
+    title: OSDM Converter API
+    description: Helper service that converts from  API that returns a trip specification on ODSM format based on NeTEx serviceJourneyId, stopPlaceId and travel date
+    version: 1.0.0
 paths:
-  /trip-pattern:
-    post:
-      tags:
-        - Osdm converter
-      summary: Returns trip information on a ODSM format
-      requestBody:
-        description: NeTEx trip pattern request
-        content: 
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ConvertTripPatternRequest'
-      responses:
-        '200':
-          description: A minimal OSDM trip specification from origin to destination with additional id.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConvertTripPatternResponse'
+    /trip-pattern:
+        post:
+            tags:
+                - Osdm converter
+            summary: Converts a NeTEx trip pattern to an OSDM trip specification
+            requestBody:
+                description: NeTEx trip pattern
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ConvertTripPatternRequest'
+            responses:
+                '200':
+                    description: An OSDM trip specification containing the required search
+                        parameters for finding the legs, as per Samtrafiken Access handbook,
+                        [Searching for offers with TripSpecification](https://samtrafiken.atlassian.net/wiki/spaces/SamA/pages/3757113410/Searching+for+offers+with+TripSpecification).
+
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ConvertTripPatternResponse'
 
 components:
-  schemas:
-    ConvertTripPatternRequest:
-      type: object
-      properties:
-        id:
-          type: string
-          nullable: true
-        legs:
-          type: array
-          items:
-            $ref: '#/components/schemas/Leg'
-      required:
-          - legs
-    Leg:
-      type: object
-      properties:
-        id:
-          type: string
-          nullable: true
-        travelDate:
-          type: string
-          format: date
-          example: "2024-05-17"
-        fromStopPlaceId:
-          type: string
-          example: "SE:050:StopPlace:9021050000003000_2"
-        toStopPlaceId:
-          type: string
-          example: "SE:050:StopPlace:9021050025315000_2"
-        serviceJourneyId:
-          type: string
-          example: "SE:050:ServiceJourney:121120000338664260"
-      required:
-        - travelDate
-        - fromStopPlaceId
-        - toStopPlaceId
-        - serviceJourneyId
-    ConvertTripPatternResponse:
-      type: object
-      properties:
-        id:
-          type: string
-          nullable: true
-        tripSpecification:
-          $ref: 'OSDM-online-api-v3.0.3.yml#/components/schemas/TripSpecification'
-      required:
-          - tripSpecification
+    schemas:
+        ConvertTripPatternRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                    nullable: true
+                    description: client supplied id which will be echoed in the response
+                legs:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Leg'
+            required:
+                - legs
+        Leg:
+            type: object
+            properties:
+                id:
+                    type: string
+                    nullable: true
+                    description: client supplied id, which will be echoed in the response
+                travelDate:
+                    type: string
+                    format: date
+                    example: "2024-05-17"
+                fromStopPlaceId:
+                    type: string
+                    example: "SE:050:StopPlace:9021050000003000_2"
+                toStopPlaceId:
+                    type: string
+                    example: "SE:050:StopPlace:9021050025315000_2"
+                serviceJourneyId:
+                    type: string
+                    example: "SE:050:ServiceJourney:121120000338664260"
+            required:
+                - travelDate
+                - fromStopPlaceId
+                - toStopPlaceId
+                - serviceJourneyId
+        ConvertTripPatternResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                    nullable: true
+                tripSpecification:
+                    $ref: 'OSDM-online-api-v3.0.3.yml#/components/schemas/TripSpecification'
+            required:
+                - tripSpecification
