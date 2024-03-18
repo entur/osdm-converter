@@ -1,0 +1,93 @@
+version: 2.1
+
+orbs:
+  gradle: circleci/gradle@3.0.0 # https://circleci.com/developer/orbs/orb/circleci/gradle
+  docker: circleci/docker@2.2.0 # https://circleci.com/developer/orbs/orb/circleci/docker
+  sonarcloud: sonarsource/sonarcloud@1.1.1 # https://circleci.com/developer/orbs/orb/sonarsource/sonarcloud
+  owasp: entur/owasp@volatile  # https://circleci.com/developer/orbs/orb/entur/owasp
+
+executors:
+  java:
+    docker:
+      - image: cimg/openjdk:17.0.8 # https://circleci.com/developer/images/image/cimg/openjdk
+        auth:
+          username: $DOCKERHUB_LOGIN
+          password: $DOCKERHUB_PASSWORD
+        environment:
+          TERM: dumb
+
+
+  google-sdk:
+    docker:
+      - image: cimg/gcp:2023.06 # https://circleci.com/developer/images/image/cimg/gcp
+        auth:
+          username: $DOCKERHUB_LOGIN
+          password: $DOCKERHUB_PASSWORD
+
+
+jobs:
+  sonar-scan:
+    executor: java
+    steps:
+      - checkout
+      - run:
+          name: Create properties for SonarCloud
+          command: bash .circleci/generate-sonar-properties_java.sh
+      - sonarcloud/scan
+
+workflows:
+  main:
+    jobs:
+      - gradle/test:
+          name: build_test
+          context: global
+          test_command: clean build
+          cache_key: v1
+          executor: java
+          post-steps:
+            - persist_to_workspace:
+                root: build/libs
+                paths:
+                  - '*'
+#      - sonar-scan:
+#          context: global
+#          pre-steps:
+#            - checkout
+#            - run:
+#                name: Create properties for SonarCloud
+#                command: bash .circleci/generate-sonar-properties_java.sh
+#          post-steps:
+#            - store_artifacts:
+#                path: ./build/reports/jacoco/test
+#          requires:
+#            - build_test
+      - docker/hadolint:
+          name: hadolint
+          context: global
+          dockerfiles: Dockerfile
+          trusted-registries: docker.io,eu.gcr.io,gcr.io
+          # DL3008 - no apt get version pin
+          ignore-rules: DL3008
+          requires:
+            - build_test
+          filters:
+            branches:
+              ignore:
+                - /renovate\/.*/
+      - docker/publish:
+          name: "Publish Docker image to GCR"
+          registry: $DOCKER_REGISTRY
+          image: "${CIRCLE_PROJECT_REPONAME}"
+          tag: $VERSION
+          context: global
+          requires:
+#            - sonar-scan
+            - hadolint
+          after_checkout:
+            - attach_workspace:
+                at: build/libs
+          filters:
+            branches:
+              only: master
+          before_build:
+            - run: echo "export VERSION=$(echo ${CIRCLE_BRANCH}-$(date '+%Y-%m-%d-%H%M')-${CIRCLE_SHA1:0:7}-${CIRCLE_WORKFLOW_ID:0:4} | tr '/' '.' )" >> $BASH_ENV
