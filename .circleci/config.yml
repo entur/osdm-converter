@@ -41,7 +41,7 @@ workflows:
       - gradle/test:
           name: build_test
           context: global
-          test_command: clean build
+          test_command: -Pentur=true clean build
           cache_key: v1
           executor: java
           post-steps:

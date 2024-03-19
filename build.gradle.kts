@@ -55,6 +55,18 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+
+
+    if (findProperty("entur") == "true") {
+        println("entur!")
+        // ---------- Entur ------ ---- \\
+        val oidcAuthVersion = "3.9.1"
+        implementation("org.entur.auth:oidc-auth-client-spring-boot-starter:$oidcAuthVersion")
+        implementation("org.entur.auth:oauth2-rs-spring-boot-3-web:${oidcAuthVersion}")
+        testImplementation("org.entur.auth:oauth2-rs-spring-boot-3-web-test:${oidcAuthVersion}")
+    }
+
 }
 
 tasks.withType<KotlinCompile> {
