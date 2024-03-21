@@ -11,7 +11,8 @@ import java.time.ZonedDateTime
 @RestController
 class OsdmConverterController(
     private val stopsRepository: StopsRepository,
-    private val serviceJourneyRepository: ServiceJourneyRepository
+    private val serviceJourneyRepository: ServiceJourneyRepository,
+    private val samtrafikenConverter: SamtrafikenConverter?
 ) {
     val modes = mapOf(
         "bus" to "BUS",
@@ -24,6 +25,8 @@ class OsdmConverterController(
 
     @PostMapping("trip-pattern")
     fun convertTripPattern(@RequestBody request: ConvertTripPatternRequest): ConvertTripPatternResponse {
+        if (samtrafikenConverter != null) return samtrafikenConverter.convertTripPattern(request)
+
         return ConvertTripPatternResponse(
             id = request.id,
             tripSpecification = TripSpecification(legs = request.legs.map(::toTripLegSpecification))

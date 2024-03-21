@@ -6,10 +6,10 @@ Content-Type: application/json
     "legs": [
         {
             "id": "foo",
-            "travelDate": "2024-05-17",
-            "fromStopPlaceId": "SE:050:StopPlace:9021050000166000_1",
-            "toStopPlaceId": "SE:050:StopPlace:9021050000120000_2",
-            "serviceJourneyId": "SE:050:ServiceJourney:747400000000001729"
+            "travelDate": "2024-03-28",
+            "fromStopPlaceId": "NSR:StopPlace:337",
+            "toStopPlaceId": "NSR:StopPlace:374",
+            "serviceJourneyId": "NSB:ServiceJourney:111-387-LOD_186476-R"
         }
     ]
 }

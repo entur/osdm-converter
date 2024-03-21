@@ -24,7 +24,8 @@ class OsdmConverterControllerTest {
     fun setUp() {
         stopsRepository = StopsRepository()
         serviceJourneyRepository = ServiceJourneyRepository()
-        osdmConverterController = OsdmConverterController(stopsRepository, serviceJourneyRepository)
+
+        osdmConverterController = OsdmConverterController(stopsRepository, serviceJourneyRepository, null)
 
         stopsRepository.addStop(fromStopPlaceId, 6000001)
         stopsRepository.addStop(toStopPlaceId, 6000002)

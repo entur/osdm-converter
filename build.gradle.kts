@@ -27,19 +27,29 @@ repositories {
     }
 }
 
+val springCloudVersion = "2023.0.0"
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}")
+    }
+}
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
+
+
     // ---------- Swagger ---------- \\
     val springdocStarterVersion = "2.3.0"
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocStarterVersion")
 
     // ---------- Spring Cloud ---------- \\
-    val springCloudVersion = "4.1.0"
-    implementation("org.springframework.cloud:spring-cloud-starter-openfeign:$springCloudVersion")
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
 
     implementation("org.eaxy:eaxy:0.2.2")
 
@@ -80,6 +90,25 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+tasks.register<GenerateTask>("generateOsdmSpec") {
+    val buildPath = layout.buildDirectory.get().asFile.path
+    validateSpec.set(false)
+    inputSpec.set("$rootDir/src/main/resources/OSDM-online-api-v3.0.3.yml")
+    generatorName.set("kotlin-spring")
+    outputDir.set("${buildPath}/generated-openapi/osdm")
+    modelPackage.set("io.osdm")
+
+    typeMappings.set(mapOf("java.time.OffsetDateTime" to "java.time.ZonedDateTime"))
+    globalProperties.put("models", "")
+    generateApiTests.set(false)
+    configOptions.put("gradleBuildFile", "false")
+    configOptions.put("collectionType", "list")
+    configOptions.put("enumPropertyNaming", "UPPERCASE")
+    configOptions.put("useSpringBoot3", "true")
+
+    sourceSets["main"].java.srcDir(file("${buildPath}/generated-openapi/osdm/src/main"))
+}
+
 tasks.register<GenerateTask>("generateOSDMCoverterSpec") {
     validateSpec.set(false)
     inputSpec.set("$rootDir/src/main/resources/OSDM-converter-api-v1.yml")
@@ -100,5 +129,6 @@ tasks.register<GenerateTask>("generateOSDMCoverterSpec") {
 }
 
 tasks.compileKotlin {
+    dependsOn(tasks.getByName("generateOsdmSpec"))
     dependsOn(tasks.getByName("generateOSDMCoverterSpec"))
 }

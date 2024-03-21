@@ -7296,9 +7296,9 @@ components:
         NO when not exchangeable or exchangeable with 100% fee, WITH_CONDITIONS in all other cases.
       type: string
       enum:
-        - YES
-        - NO
-        - WITH_CONDITION
+        - "YES"
+        - "NO"
+        - "WITH_CONDITION"
 
     ExcludedTimeRange:
       type: object
@@ -10686,9 +10686,9 @@ components:
     RefundType:
       type: string
       enum:
-        - YES
-        - NO
-        - WITH_CONDITION
+        - "YES"
+        - "NO"
+        - "WITH_CONDITION"
 
     RegionalConstraint:
       type: object

@@ -3,3 +3,25 @@ server:
 spring:
     application:
         name: osdm-converter
+    cloud:
+        openfeign:
+            client:
+                config:
+                    default:
+                        loggerLevel: BASIC
+                        defaultRequestHeaders:
+                            Et-Client-Name: entur-osdm-converter
+                    journey-planner:
+                        url: ${JOURNEY_PLANNER_URL:https://api.dev.entur.io/journey-planner/v3/graphql}
+
+samtrafiken:
+    secret: ${SAMTRAFIKEN_CLIENT_SECRET:foo}
+    clientId: ${SAMTRAFIKEN_CLIENT_ID:bar}
+
+logging:
+    level:
+        org:
+            entur:
+                osdmconverter:
+                    ror: DEBUG
+                    samtrafiken: DEBUG
