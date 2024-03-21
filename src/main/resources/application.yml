@@ -18,6 +18,18 @@ samtrafiken:
     secret: ${SAMTRAFIKEN_CLIENT_SECRET:foo}
     clientId: ${SAMTRAFIKEN_CLIENT_ID:bar}
 
+entur:
+    logging:
+        mode: json
+        mdc:
+            enabled: true
+        filter:
+            enabled: true
+    auth:
+        tenants:
+            environment: ${JWT_ENVIRONMENT:dev}
+            include: internal
+
 logging:
     level:
         org:

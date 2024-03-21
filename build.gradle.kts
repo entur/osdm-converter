@@ -72,9 +72,9 @@ dependencies {
         println("entur!")
         // ---------- Entur ------ ---- \\
         val oidcAuthVersion = "3.9.1"
-        implementation("org.entur.auth:oidc-auth-client-spring-boot-starter:$oidcAuthVersion")
         implementation("org.entur.auth:oauth2-rs-spring-boot-3-web:${oidcAuthVersion}")
         testImplementation("org.entur.auth:oauth2-rs-spring-boot-3-web-test:${oidcAuthVersion}")
+        implementation("org.entur.logging:common-logging-spring-boot-starter:2.0.1")
     }
 
 }
